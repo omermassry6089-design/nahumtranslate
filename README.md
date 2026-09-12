@@ -129,6 +129,7 @@
             resultArea.innerText = 'חושב...';
             resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-amber-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
 
+            // המפתח שלך מוגדר כאן ישירות
             const apiKey = "AQ.Ab8RN6Kt9LzSL27CfvajSBHgdSMXSQBUU7yfOXgoT0aanJRaTg";
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
@@ -157,11 +158,14 @@
                     const reply = data.candidates[0].content.parts[0].text;
                     resultArea.innerText = reply;
                     resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-slate-100 whitespace-pre-wrap leading-relaxed text-base text-right justify-start';
+                } else if (data.error) {
+                    throw new Error(data.error.message);
                 } else {
                     throw new Error('תשובה לא תקינה מהשרת');
                 }
             } catch (error) {
-                resultArea.innerText = 'שגיאה בחיבור ל-Gemini API. נסה שוב.';
+                console.error(error);
+                resultArea.innerText = 'שגיאה: ' + error.message;
                 resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-red-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
             } finally {
                 btn.disabled = false;

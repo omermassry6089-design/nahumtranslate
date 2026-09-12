@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.8.0.3 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		p { margin-bottom: 0.1in; line-height: 115%; background: transparent }
+		pre { font-size: 10pt; font-family: "Liberation Mono", monospace; background: transparent }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;he&quot; dir=&quot;rtl&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;<span lang="hi-IN">נחום </span>Translate - StackBlitz Edition&lt;/title&gt;
+    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4&quot;&gt;&lt;/script&gt;
+    &lt;style&gt;
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&quot;bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4&quot;&gt;
+
+    &lt;canvas id=&quot;bgCanvas&quot;&gt;&lt;/canvas&gt;
+
+    &lt;div class=&quot;w-full max-w-xl bg-slate-900/90 backdrop-blur-md border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl relative z-10&quot;&gt;
+        &lt;div class=&quot;flex justify-between items-center mb-6&quot;&gt;
+            &lt;div&gt;
+                &lt;h1 class=&quot;text-3xl font-black text-sky-400 mb-1 flex items-center gap-2&quot;&gt;
+                    &lt;span&gt;🤖&lt;/span&gt; <span lang="hi-IN">נחום </span>Translate
+                &lt;/h1&gt;
+                &lt;p class=&quot;text-slate-400 text-sm&quot;&gt;<span lang="hi-IN">הדבק כאן הודעת נחום, ותקבל סיכום קצר, מדויק ותכל'סי</span>&lt;/p&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;space-y-4&quot;&gt;
+            &lt;div&gt;
+                &lt;textarea 
+                    id=&quot;userInput&quot; 
+                    placeholder=&quot;<span lang="hi-IN">הדבק לכאן את הודעת נחום הארוכה</span>...&quot;
+                    class=&quot;w-full h-36 bg-slate-950/60 border border-slate-700 rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 transition resize-none text-base&quot;
+                &gt;&lt;/textarea&gt;
+            &lt;/div&gt;
+
+            &lt;button 
+                onclick=&quot;translateText()&quot; 
+                id=&quot;translateBtn&quot;
+                class=&quot;w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-lg shadow-sky-500/20 active:scale-[0.99] cursor-pointer text-lg&quot;
+            &gt;
+<span lang="hi-IN">                תביא לי את התכל'ס</span>
+            &lt;/button&gt;
+
+            &lt;div class=&quot;mt-6 pt-4 border-t border-slate-800&quot;&gt;
+                &lt;div class=&quot;text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider&quot;&gt;<span lang="hi-IN">השורה התחתונה (תכל'ס)</span>:&lt;/div&gt;
+                &lt;div 
+                    id=&quot;resultArea&quot; 
+                    class=&quot;w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-slate-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center&quot;
+                &gt;
+<span lang="hi-IN">                    התשובה תופיע כאן</span>...
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;script&gt;
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = Array.from({ length: 40 }, () =&gt; ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2 + 1,
+            speedX: (Math.random() - 0.5) * 0.5,
+            speedY: (Math.random() - 0.5) * 0.5,
+            opacity: Math.random() * 0.5 + 0.2
+        }));
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p =&gt; {
+                p.x += p.speedX;
+                p.y += p.speedY;
+
+                if (p.x &lt; 0) p.x = canvas.width;
+                if (p.x &gt; canvas.width) p.x = 0;
+                if (p.y &lt; 0) p.y = canvas.height;
+                if (p.y &gt; canvas.height) p.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(56, 189, 248, ${p.opacity})`;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        async function translateText() {
+            const text = document.getElementById('userInput').value.trim();
+            const resultArea = document.getElementById('resultArea');
+            const btn = document.getElementById('translateBtn');
+
+            if (!text) {
+                resultArea.innerText = '<span lang="hi-IN">נא להדביק הודעה תחילה</span>.';
+                resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-amber-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = '<span lang="hi-IN">מנקה חפירות</span>...';
+            resultArea.innerText = '<span lang="hi-IN">חושב</span>...';
+            resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-amber-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
+
+            const apiKey = &quot;AQ.Ab8RN6Kt9LzSL27CfvajSBHgdSMXSQBUU7yfOXgoT0aanJRaTg&quot;;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent`;
+
+            const systemPrompt = `<span lang="hi-IN">אתה &quot;נחום </span>Translate&quot; - <span lang="hi-IN">כלי קצה אגרסיבי ומהיר שממיר הודעות ארוכות ומלאות בחפירות להודעה קצרה, ישירה וברורה בפורמט &quot;תכל'ס&quot; נטו</span>.
+
+<span lang="hi-IN">חוקי ברזל חובה</span>:
+1. <span lang="hi-IN">אסור לחלוטין לכתוב מבואות, משפטי פתיחה או סיכומים כמו &quot;הכוונה היא&quot;, &quot;לסיכום&quot;, מרכאות או כותרות. פלט את התשובה הישירה בלבד</span>.
+2. <span lang="hi-IN">תמצת כל הודעה למשפטים קצרים וקולעים בשורות נפרדות אם יש מספר נתונים</span>.
+3. <span lang="hi-IN">שמור בדיוק על הסגנון והשפה של כותב ההודעה המקורית אך ללא שום מילים מיותרות</span>.
+4. <span lang="hi-IN">הוצא אך ורק את השורה התחתונה המעשית המדויקת</span>.`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-goog-api-key': apiKey
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            role: 'user',
+                            parts: [{
+                                text: systemPrompt + &quot;\n\n<span lang="hi-IN">הודעה לתרגום</span>:\n&quot; + text
+                            }]
+                        }],
+                        generationConfig: { 
+                            temperature: 0.1, 
+                            maxOutputTokens: 2048 
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error?.message || '<span lang="hi-IN">שגיאת תקשורת עם המודל</span>.');
+                }
+
+                const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (result) {
+                    resultArea.innerText = result.trim();
+                    resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-emerald-400 whitespace-pre-wrap leading-relaxed text-base text-right';
+                } else {
+                    throw new Error('<span lang="hi-IN">לא התקבלה תשובה תקינה</span>');
+                }
+            } catch (err) {
+                resultArea.innerText = '<span lang="hi-IN">שגיאה</span>: ' + err.message;
+                resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-rose-400 whitespace-pre-wrap leading-relaxed text-base';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = &quot;<span lang="hi-IN">תביא לי את התכל'ס</span>&quot;;
+            }
+        }
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+</body>
+</html>

@@ -3,25 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>נחום Translate - StackBlitz Edition</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>נחום Translate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        canvas {
+        body {
+            margin: 0;
+            background-color: #0f172a;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+        #bgCanvas {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4">
+<body>
 
     <canvas id="bgCanvas"></canvas>
 
-    <div class="w-full max-w-xl bg-slate-900/90 backdrop-blur-md border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl relative z-10">
+    <div class="w-full max-w-xl bg-slate-900/90 backdrop-blur-md border border-slate-800 p-6 md:p-8 rounded-2xl shadow-2xl relative z-10 m-4">
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-3xl font-black text-sky-400 mb-1 flex items-center gap-2">
@@ -121,52 +130,39 @@
             resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-amber-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
 
             const apiKey = "AQ.Ab8RN6Kt9LzSL27CfvajSBHgdSMXSQBUU7yfOXgoT0aanJRaTg";
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-            const systemPrompt = `אתה "נחום Translate" - כלי קצה אגרסיבי ומהיר שממיר הודעות ארוכות ומלאות בחפירות להודעה קצרה, ישירה וברורה בפורמט "תכל'ס" נטו.
-
-חוקי ברזל חובה:
-1. אסור לחלוטין לכתוב מבואות, משפטי פתיחה או סיכומים כמו "הכוונה היא", "לסיכום", מרכאות או כותרות. פלט את התשובה הישירה בלבד.
-2. תמצת כל הודעה למשפטים קצרים וקולעים בשורות נפרדות אם יש מספר נתונים.
-3. שמור בדיוק על הסגנון והשפה של כותב ההודעה המקורית אך ללא שום מילים מיותרות.
-4. הוצא אך ורק את השורה התחתונה המעשית המדויקת.`;
+            const systemPrompt = `אתה "נחום Translate" - כלי קצה אגרסיבי ומהיר שממיר הודעות ארוכות ומלאות בחפירות להודעה קצרה, ישירה וברורה בפורמט "תכל'ס" נטו. תן סיכום תכליתי בלבד.`;
 
             try {
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'x-goog-api-key': apiKey
+                    headers: {
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        contents: [{
-                            role: 'user',
-                            parts: [{
-                                text: systemPrompt + "\n\nהודעה לתרגום:\n" + text
-                            }]
-                        }],
-                        generationConfig: { 
-                            temperature: 0.1, 
-                            maxOutputTokens: 2048 
-                        }
+                        contents: [
+                            {
+                                parts: [
+                                    { text: systemPrompt + "\n\nהודעה לסיכום:\n" + text }
+                                ]
+                            }
+                        ]
                     })
                 });
 
                 const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error?.message || 'שגיאת תקשורת עם המודל.');
-                }
 
-                const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (result) {
-                    resultArea.innerText = result.trim();
-                    resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-emerald-400 whitespace-pre-wrap leading-relaxed text-base text-right';
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    const reply = data.candidates[0].content.parts[0].text;
+                    resultArea.innerText = reply;
+                    resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-slate-100 whitespace-pre-wrap leading-relaxed text-base text-right justify-start';
                 } else {
-                    throw new Error('לא התקבלה תשובה תקינה');
+                    throw new Error('תשובה לא תקינה מהשרת');
                 }
-            } catch (err) {
-                resultArea.innerText = 'שגיאה: ' + err.message;
-                resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-rose-400 whitespace-pre-wrap leading-relaxed text-base';
+            } catch (error) {
+                resultArea.innerText = 'שגיאה בחיבור ל-Gemini API. נסה שוב.';
+                resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-red-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
             } finally {
                 btn.disabled = false;
                 btn.innerText = "תביא לי את התכל'ס";

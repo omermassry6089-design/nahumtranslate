@@ -113,60 +113,69 @@
         }
         animate();
 
-        async function translateText() {
-            const text = document.getElementById('userInput').value.trim();
-            const resultArea = document.getElementById('resultArea');
-            const btn = document.getElementById('translateBtn');
+async function translateText() {
+    const text = document.getElementById('userInput').value.trim();
+    const resultArea = document.getElementById('resultArea');
+    const btn = document.getElementById('translateBtn');
 
-            if (!text) {
-                resultArea.innerText = 'נא להדביק הודעה תחילה.';
-                resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-amber-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
-                return;
-            }
+    if (!text) {
+        resultArea.innerText = 'נא להדביק הודעה תחילה.';
+        resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-amber-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
+        return;
+    }
 
-            btn.disabled = true;
-            btn.innerText = 'מנקה חפירות...';
-            resultArea.innerText = 'חושב...';
-            resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-amber-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
+    btn.disabled = true;
+    btn.innerText = 'מנקה חפירות...';
+    resultArea.innerText = 'חושב...';
+    resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-amber-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
 
-            const apiKey = "AQ.Ab8RN6Kt9LzSL27CfvajSBHgdSMXSQBUU7yfOXgoT0aanJRaTg";
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // 1. המפתח החדש שלך בפורמט AQ
+    const apiKey = "AQ.Ab8RN6KUcgwKJ3agQMO8aZhq1lFi9PIjUkAnNqteyEtMJenlpQ";
+    
+    // 2. שים לב: הורדנו את ה- ?key= מהסוף של הקישור!
+    const url = `https://googleapis.com`;
 
-            const systemPrompt = `אתה "נחום Translate" - כלי קצה אגרסיבי ומהיר שממיר הודעות ארוכות ומלאות בחפירות להודעה קצרה, ישירה וברורה בפורמט "תכל'ס" נטו. תן סיכום תכליתי בלבד.`;
+    const systemPrompt = `אתה "נחום Translate" - כלי קצה אגרסיבי ומהיר שממיר הודעות ארוכות ומלאות בחפירות להודעה קצרה, ישירה וברורה בפורמט "תכל'ס" נטו. תן סיכום תכליתי בלבד.`;
 
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contents: [
-                            {
-                                parts: [
-                                    { text: systemPrompt + "\n\nהודעה לסיכום:\n" + text }
-                                ]
-                            }
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // 3. התיקון הקריטי: מעבירים את מפתח ה-AQ בצורה מאובטחת כאן
+                'x-goog-api-key': apiKey 
+            },
+            body: JSON.stringify({
+                contents: [
+                    {
+                        parts: [
+                            { text: systemPrompt + "\n\nהודעה לסיכום:\n" + text }
                         ]
-                    })
-                });
+                    }
+                ]
+            })
+        });
 
-                const data = await response.json();
+        const data = await response.json();
 
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    const reply = data.candidates[0].content.parts[0].text;
-                    resultArea.innerText = reply;
-                    resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-slate-100 whitespace-pre-wrap leading-relaxed text-base text-right justify-start';
-                } else {
-                    throw new Error('תשובה לא תקינה מהשרת');
-                }
-            } catch (error) {
-                resultArea.innerText = 'שגיאה בחיבור ל-Gemini API. נסה שוב.';
-                resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-red-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "תביא לי את התכל'ס";
-            }
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const reply = data.candidates[0].content.parts[0].text;
+            resultArea.innerText = reply;
+            resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-slate-100 whitespace-pre-wrap leading-relaxed text-base text-right justify-start';
+        } else {
+            // אם גוגל מחזירה שגיאה מפורטת, נציג אותה בקונסול לבדיקה
+            console.error('Google API Error:', data);
+            throw new Error('תשובה לא תקינה מהשרת');
+        }
+    } catch (error) {
+        resultArea.innerText = 'שגיאה בחיבור ל-Gemini API. נסה שוב.';
+        resultArea.className = 'w-full min-h-[80px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-red-400 whitespace-pre-wrap leading-relaxed text-base flex items-center justify-center text-center';
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "תביא לי את התכל'ס";
+    }
+}
+
         }
     </script>
 </body>
